@@ -5,14 +5,14 @@
 // ============================================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { auth0 } from "@/lib/auth0";
 import { prisma } from "@/lib/db";
 import { generateText } from "@/lib/ai";
 
 export async function POST(request: NextRequest) {
   try {
     // 1. 验证用户身份
-    const session = await auth();
+    const session = await auth0.getSession();
     const userEmail = session?.user?.email;
 
     if (!userEmail) {

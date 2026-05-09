@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { useSession } from "next-auth/react";
+import { useUser } from "@auth0/nextjs-auth0/client";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -20,7 +20,7 @@ function StatCard({ label, value, accent }: { label: string; value: string | num
 
 // ─── Inner content ───────────────────────────────────────────
 function DashboardContent() {
-  const { data: session, status } = useSession();
+  const { user, isLoading: authLoading } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [usage, setUsage] = useState<UserUsage | null>(null);
@@ -30,11 +30,11 @@ function DashboardContent() {
   const purchase = searchParams.get("purchase");
 
   useEffect(() => {
-    if (status === "unauthenticated") router.push("/login");
-  }, [status, router]);
+    if (!user) router.push("/login");
+  }, [user, router]);
 
   useEffect(() => {
-    if (status !== "authenticated") return;
+    if (!user) return;
     (async () => {
       try {
         const [u, a] = await Promise.all([
@@ -49,10 +49,10 @@ function DashboardContent() {
         setLoading(false);
       }
     })();
-  }, [status]);
+  }, [user]);
 
   // ── Skeleton ──
-  if (status === "loading" || loading) {
+  if (authLoading || loading) {
     return (
       <div className="mx-auto max-w-4xl px-5 py-16 sm:px-8">
         <div className="space-y-5">
@@ -83,7 +83,7 @@ function DashboardContent() {
         <div>
           <h1 className="font-serif text-2xl text-text-heading">Dashboard</h1>
           <p className="mt-1 text-sm text-text-muted">
-            Welcome back, {session?.user?.name || session?.user?.email}
+            Welcome back, {user?.name || user?.email}
           </p>
         </div>
         <Link
@@ -112,8 +112,8 @@ function DashboardContent() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <PurchaseButton email={session?.user?.email || ""} tier="creator" credits={30} price="4.99" label="30 Credits — $4.99" />
-              <PurchaseButton email={session?.user?.email || ""} tier="pro" credits={200} price="12.99" label="200 Credits — $12.99" />
+              <PurchaseButton email={user?.email || ""} tier="creator" credits={30} price="4.99" label="30 Credits — $4.99" />
+              <PurchaseButton email={user?.email || ""} tier="pro" credits={200} price="12.99" label="200 Credits — $12.99" />
             </div>
           </div>
         </div>

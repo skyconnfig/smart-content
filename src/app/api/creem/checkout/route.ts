@@ -5,7 +5,7 @@
 // ============================================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { auth0 } from "@/lib/auth0";
 
 const CREEM_API_KEY = process.env.CREEM_API_KEY || "";
 
@@ -24,7 +24,7 @@ const TIER_CONFIG: Record<string, { productId: string; credits: number }> = {
 export async function POST(request: NextRequest) {
   try {
     // 1. 验证用户身份
-    const session = await auth();
+    const session = await auth0.getSession();
     const userEmail = session?.user?.email;
 
     if (!userEmail) {

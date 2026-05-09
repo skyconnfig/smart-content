@@ -3,12 +3,12 @@
 // ============================================================
 
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { auth0 } from "@/lib/auth0";
 import { prisma } from "@/lib/db";
 
 export async function GET() {
   try {
-    const session = await auth();
+    const session = await auth0.getSession();
     const userEmail = session?.user?.email;
 
     if (!userEmail) {

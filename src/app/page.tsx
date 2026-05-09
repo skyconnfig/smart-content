@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useSession, signIn } from "next-auth/react";
+import { useUser } from "@auth0/nextjs-auth0/client";
 import Link from "next/link";
 import KeywordInput from "@/components/KeywordInput";
 import TemplateSelect from "@/components/TemplateSelect";
@@ -10,7 +10,7 @@ import PurchaseButton from "@/components/PurchaseButton";
 import type { TemplateStyle } from "@/types";
 
 export default function Home() {
-  const { data: session } = useSession();
+  const { user } = useUser();
   const [keyword, setKeyword] = useState("");
   const [template, setTemplate] = useState<TemplateStyle>("blog");
   const [result, setResult] = useState<string | null>(null);
@@ -20,7 +20,7 @@ export default function Home() {
   const [remainingFree, setRemainingFree] = useState<number | null>(null);
 
   const handleGenerate = useCallback(async () => {
-    if (!session?.user?.email) { signIn(); return; }
+    if (!user?.email) { window.location.href = "/auth/login"; return; }
     if (!keyword.trim()) { setError("Enter a topic to get started."); return; }
 
     setIsLoading(true);
@@ -46,7 +46,7 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  }, [keyword, template, session]);
+  }, [keyword, template, user]);
 
   return (
     <div className="mx-auto max-w-6xl px-5 sm:px-8">
@@ -158,7 +158,7 @@ export default function Home() {
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
-              {session?.user ? (
+              {user ? (
                 <span>Credits: <span className="font-medium text-text-body">{remainingFree ?? "—"} remaining</span></span>
               ) : (
                 <span>Sign in to get started</span>
@@ -277,10 +277,10 @@ export default function Home() {
             </div>
             <div className="mt-auto pt-8">
               <Link
-                href={session?.user ? "#generator" : "/signup"}
+                href={user ? "#generator" : "/signup"}
                 className="flex w-full items-center justify-center rounded-md border border-border-light px-4 py-2.5 text-sm font-medium text-text-body transition-colors hover:bg-bg-elevated"
               >
-                {session?.user ? "Start Writing" : "Create Free Account"}
+                {user ? "Start Writing" : "Create Free Account"}
               </Link>
             </div>
           </div>
@@ -319,8 +319,8 @@ export default function Home() {
               </ul>
             </div>
             <div className="relative mt-auto pt-8">
-              {session?.user ? (
-                <PurchaseButton email={session.user.email!} tier="creator" credits={30} price="4.99" label="Get 30 Credits — $4.99" />
+              {user ? (
+                <PurchaseButton email={user.email!} tier="creator" credits={30} price="4.99" label="Get 30 Credits — $4.99" />
               ) : (
                 <Link
                   href="/signup"
@@ -362,8 +362,8 @@ export default function Home() {
               </ul>
             </div>
             <div className="mt-auto pt-8">
-              {session?.user ? (
-                <PurchaseButton email={session.user.email!} tier="pro" credits={200} price="12.99" label="Get 200 Credits — $12.99" />
+              {user ? (
+                <PurchaseButton email={user.email!} tier="pro" credits={200} price="12.99" label="Get 200 Credits — $12.99" />
               ) : (
                 <Link
                   href="/signup"
@@ -390,7 +390,7 @@ export default function Home() {
               Join thousands of writers, marketers, and entrepreneurs using CopyForge to produce content at the speed of AI.
             </p>
             <div className="mt-8 flex items-center justify-center gap-4">
-              {session?.user ? (
+              {user ? (
                 <a href="#generator" className="rounded-md bg-white px-5 py-2.5 text-sm font-medium text-accent-teal shadow-sm transition-all hover:bg-white/90">
                   Generate Content Now
                 </a>
@@ -399,9 +399,9 @@ export default function Home() {
                   <Link href="/signup" className="rounded-md bg-white px-5 py-2.5 text-sm font-medium text-accent-teal shadow-sm transition-all hover:bg-white/90">
                     Get Started Free
                   </Link>
-                  <button onClick={() => signIn()} className="rounded-md border border-white/30 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10">
+                  <a href="/auth/login" className="rounded-md border border-white/30 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10">
                     Sign In
-                  </button>
+                  </a>
                 </>
               )}
             </div>
