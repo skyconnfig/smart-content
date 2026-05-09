@@ -7,7 +7,7 @@ import NextAuth from "next-auth";
 import Auth0 from "next-auth/providers/auth0";
 import Resend from "next-auth/providers/resend";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "./db";
+import { prisma } from "./db"; // used by PrismaAdapter below
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -41,23 +41,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return session;
     },
-    async signIn({ user }) {
-      // 用户首次登录时，PrismaAdapter 会自动创建用户
+    async signIn() {
+      // PrismaAdapter 在 OAuth 回调中已自动创建 User，
       // freeCount 默认值由 schema 中的 @default(2) 控制
-      if (user.email) {
-        const existing = await prisma.user.findUnique({
-          where: { email: user.email },
-        });
-        if (!existing) {
-          await prisma.user.create({
-            data: {
-              email: user.email,
-              name: user.name,
-              image: user.image,
-            },
-          });
-        }
-      }
       return true;
     },
   },

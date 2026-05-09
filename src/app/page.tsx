@@ -6,6 +6,7 @@ import Link from "next/link";
 import KeywordInput from "@/components/KeywordInput";
 import TemplateSelect from "@/components/TemplateSelect";
 import ResultDisplay from "@/components/ResultDisplay";
+import PurchaseButton from "@/components/PurchaseButton";
 import type { TemplateStyle } from "@/types";
 
 export default function Home() {
@@ -246,60 +247,132 @@ export default function Home() {
           <p className="mt-3 text-text-muted">No subscription. No hidden fees. Just credits that last.</p>
         </div>
 
-        <div className="mx-auto mt-14 grid max-w-3xl gap-8 sm:grid-cols-2 stagger">
-          {/* Free */}
-          <div className="animate-fade-in-up rounded-xl border border-border-light bg-bg-surface p-8 shadow-sm transition-all hover:shadow-md">
-            <h3 className="font-serif text-xl text-text-heading">Free</h3>
-            <div className="mt-4 flex items-baseline gap-1">
-              <span className="font-serif text-4xl text-text-heading">$0</span>
-              <span className="text-xs text-text-dim">/ forever</span>
+        <div className="mx-auto mt-14 grid max-w-5xl gap-6 sm:grid-cols-3 stagger">
+          {/* ── Free ── */}
+          <div className="animate-fade-in-up rounded-xl border border-border-light bg-bg-surface p-6 shadow-sm transition-all hover:shadow-md flex flex-col">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.12em] text-text-muted">Free</p>
+              <h3 className="sr-only">Free</h3>
+              <div className="mt-4 flex items-baseline gap-1">
+                <span className="font-serif text-5xl text-text-heading">$0</span>
+                <span className="text-xs text-text-dim">/ forever</span>
+              </div>
+              <p className="mt-1 text-sm text-text-muted">Perfect for trying it out</p>
+
+              <ul className="mt-6 space-y-3 text-sm">
+                {[
+                  "2 AI content generations",
+                  "Blog, SEO & social templates",
+                  "Copy to clipboard",
+                  "No credit card required",
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-3">
+                    <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent-teal" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                    <span className="text-text-muted">{f}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="mt-1 text-sm text-text-muted">Get a taste of AI-powered writing</p>
-            <ul className="mt-8 space-y-3 text-sm">
-              {["2 free generations", "All 4 template styles", "Copy to clipboard", "No credit card required"].map((f) => (
-                <li key={f} className="flex items-start gap-3">
-                  <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent-teal" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                  </svg>
-                  <span className="text-text-muted">{f}</span>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href={session?.user ? "#generator" : "/signup"}
-              className="mt-8 flex w-full items-center justify-center rounded-md border border-border-light px-4 py-2.5 text-sm font-medium text-text-body transition-colors hover:bg-bg-elevated"
-            >
-              {session?.user ? "Start Writing" : "Create Free Account"}
-            </Link>
+            <div className="mt-auto pt-8">
+              <Link
+                href={session?.user ? "#generator" : "/signup"}
+                className="flex w-full items-center justify-center rounded-md border border-border-light px-4 py-2.5 text-sm font-medium text-text-body transition-colors hover:bg-bg-elevated"
+              >
+                {session?.user ? "Start Writing" : "Create Free Account"}
+              </Link>
+            </div>
           </div>
 
-          {/* Pro */}
-          <div className="animate-fade-in-up relative rounded-xl border-2 border-accent-teal/40 bg-bg-surface p-8 shadow-md transition-all hover:shadow-lg" style={{ animationDelay: "100ms" }}>
-            <div className="absolute -top-3 left-6 rounded-full bg-gradient-to-r from-accent-teal to-accent-copper px-3.5 py-1 text-xs font-medium text-white">
-              MOST POPULAR
+          {/* ── Creator ⭐ ── */}
+          <div className="animate-fade-in-up relative rounded-xl border-2 border-accent-teal/60 bg-bg-surface p-6 shadow-lg transition-all hover:shadow-xl flex flex-col" style={{ animationDelay: "80ms" }}>
+            {/* Glow effect */}
+            <div className="pointer-events-none absolute -inset-1 rounded-2xl bg-gradient-to-b from-accent-teal/10 via-transparent to-accent-copper/5 blur-xl opacity-80" />
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-gradient-to-r from-accent-teal to-accent-copper px-4 py-1 text-xs font-semibold text-white shadow-sm">
+              ⭐ Most Popular
             </div>
-            <h3 className="font-serif text-xl text-text-heading">Pro Pack</h3>
-            <div className="mt-4 flex items-baseline gap-1">
-              <span className="font-serif text-4xl text-text-heading">$4.99</span>
-              <span className="text-xs text-text-dim">/ one-time</span>
+            <div className="relative">
+              <p className="text-xs font-medium uppercase tracking-[0.12em] text-accent-copper">⭐ Creator</p>
+              <h3 className="sr-only">Creator</h3>
+              <div className="mt-4 flex items-baseline gap-1">
+                <span className="font-serif text-5xl text-text-heading">$4.99</span>
+                <span className="text-xs text-text-dim">/ one-time</span>
+              </div>
+              <p className="mt-1 text-sm text-text-muted">Best value for regular creators</p>
+
+              <ul className="mt-6 space-y-3 text-sm">
+                {[
+                  "30 AI content generations",
+                  "All template styles",
+                  "SEO-optimized content",
+                  "E-commerce & social copy",
+                  "History & export",
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-3">
+                    <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent-teal" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                    <span className="text-text-muted">{f}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="mt-1 text-sm text-text-muted">For when you need more output</p>
-            <ul className="mt-8 space-y-3 text-sm">
-              {["10 additional generations", "All 4 template styles", "Priority generation speed", "No recurring fees", "Lifetime credits"].map((f) => (
-                <li key={f} className="flex items-start gap-3">
-                  <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent-teal" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                  </svg>
-                  <span className="text-text-muted">{f}</span>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href={session?.user ? "#generator" : "/signup"}
-              className="mt-8 flex w-full items-center justify-center rounded-md bg-gradient-to-r from-accent-teal to-accent-copper px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:shadow-md"
-            >
-              {session?.user ? "Get Started" : "Sign Up Free"}
-            </Link>
+            <div className="relative mt-auto pt-8">
+              {session?.user ? (
+                <PurchaseButton email={session.user.email!} tier="creator" credits={30} price="4.99" label="Get 30 Credits — $4.99" />
+              ) : (
+                <Link
+                  href="/signup"
+                  className="flex w-full items-center justify-center rounded-md bg-gradient-to-r from-accent-teal to-accent-copper px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:shadow-md"
+                >
+                  Get Started
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* ── Pro ── */}
+          <div className="animate-fade-in-up rounded-xl border border-border-light bg-bg-surface p-6 shadow-sm transition-all hover:shadow-md flex flex-col" style={{ animationDelay: "160ms" }}>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.12em] text-text-muted">Pro</p>
+              <h3 className="sr-only">Pro</h3>
+              <div className="mt-4 flex items-baseline gap-1">
+                <span className="font-serif text-5xl text-text-heading">$12.99</span>
+                <span className="text-xs text-text-dim">/ one-time</span>
+              </div>
+              <p className="mt-1 text-sm text-text-muted">For power users and teams</p>
+
+              <ul className="mt-6 space-y-3 text-sm">
+                {[
+                  "200 AI content generations",
+                  "Long-form article generation",
+                  "Advanced SEO optimization",
+                  "Batch generation",
+                  "Content export (PDF, Markdown)",
+                  "Priority generation speed",
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-3">
+                    <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent-teal" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                    <span className="text-text-muted">{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="mt-auto pt-8">
+              {session?.user ? (
+                <PurchaseButton email={session.user.email!} tier="pro" credits={200} price="12.99" label="Get 200 Credits — $12.99" />
+              ) : (
+                <Link
+                  href="/signup"
+                  className="flex w-full items-center justify-center rounded-md border border-border-light px-4 py-2.5 text-sm font-medium text-text-body transition-colors hover:bg-bg-elevated"
+                >
+                  Sign Up Free
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </section>

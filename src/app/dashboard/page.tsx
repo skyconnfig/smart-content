@@ -104,14 +104,17 @@ function DashboardContent() {
       {/* ── Upsell ── */}
       {usage && usage.freeCount < 1 && (
         <div className="mt-8 rounded-lg border border-accent-teal/20 bg-accent-teal-bg p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4">
             <div>
               <h2 className="font-serif text-lg text-text-heading">Need more credits?</h2>
               <p className="mt-1 text-sm text-text-muted">
-                Get <strong className="text-text-body">10 additional generations</strong> — one-time purchase, no subscription.
+                One-time purchase, no subscription. Your credits never expire.
               </p>
             </div>
-            <PurchaseButton email={session?.user?.email || ""} />
+            <div className="flex flex-wrap gap-3">
+              <PurchaseButton email={session?.user?.email || ""} tier="creator" credits={30} price="4.99" label="30 Credits — $4.99" />
+              <PurchaseButton email={session?.user?.email || ""} tier="pro" credits={200} price="12.99" label="200 Credits — $12.99" />
+            </div>
           </div>
         </div>
       )}
