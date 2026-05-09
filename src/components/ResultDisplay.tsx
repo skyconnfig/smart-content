@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface ResultDisplayProps {
   content: string | null;
@@ -8,6 +8,34 @@ interface ResultDisplayProps {
   error: string | null;
   needsPurchase: boolean;
   onDismiss: () => void;
+}
+
+/**
+ * 打字机效果 Hook：每次 content 变化时逐字显示
+ */
+function useTypewriter(text: string, speed: number = 30) {
+  const [displayed, setDisplayed] = useState("");
+  const prevRef = useRef("");
+
+  useEffect(() => {
+    // 如果是同一段文本重新触发，不做处理
+    if (text === prevRef.current && displayed.length === text.length) return;
+    prevRef.current = text;
+    setDisplayed("");
+
+    if (!text) return;
+
+    let i = 0;
+    const timer = setInterval(() => {
+      i++;
+      setDisplayed(text.slice(0, i));
+      if (i >= text.length) clearInterval(timer);
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, speed]);
+
+  return displayed;
 }
 
 export default function ResultDisplay({
@@ -18,6 +46,7 @@ export default function ResultDisplay({
   onDismiss,
 }: ResultDisplayProps) {
   const [copied, setCopied] = useState(false);
+  const typewriterText = useTypewriter(content ?? "", 25);
 
   if (!content && !isLoading && !error) return null;
 
@@ -136,16 +165,23 @@ export default function ResultDisplay({
           </div>
         )}
 
-        {/* Content */}
+        {/* Content — 打字机效果显示 */}
         {content && (
           <div className="prose prose-sm max-w-none">
-            {content.split("\n").map((paragraph, i) => (
+            {typewriterText.split("\n").map((paragraph, i) => (
               paragraph.trim() ? (
                 <p key={i} className="mb-3 leading-relaxed text-text-body text-[15px]">
                   {paragraph}
+                  {i === typewriterText.split("\n").length - 1 && typewriterText.length < content.length && (
+                    <span className="inline-flex w-[2px] h-[1em] ml-0.5 bg-accent-teal animate-pulse" />
+                  )}
                 </p>
               ) : null
             ))}
+            {/* 打字完成后保留光标闪烁，提示可操作 */}
+            {typewriterText.length === content.length && (
+              <span className="inline-flex w-[2px] h-[1em] ml-0.5 bg-accent-teal/50 animate-pulse" />
+            )}
           </div>
         )}
       </div>

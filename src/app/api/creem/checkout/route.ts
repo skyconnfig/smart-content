@@ -5,7 +5,7 @@
 // ============================================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth0 } from "@/lib/auth0";
+import { auth } from "@/lib/auth";
 
 const CREEM_API_KEY = process.env.CREEM_API_KEY || "";
 
@@ -24,7 +24,7 @@ const TIER_CONFIG: Record<string, { productId: string; credits: number }> = {
 export async function POST(request: NextRequest) {
   try {
     // 1. 验证用户身份
-    const session = await auth0.getSession();
+    const session = await auth();
     const userEmail = session?.user?.email;
 
     if (!userEmail) {
@@ -47,7 +47,8 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. 调用 Creem API 创建 checkout session
-    const response = await fetch("https://api.creem.io/v1/checkout-sessions", {
+    // 文档: https://docs.creem.io/skills/creem-api/Skill#creem-api-integration-skill
+    const response = await fetch("https://api.creem.io/v1/checkouts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
         product_id: config.productId,
         success_url: `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/payment/success?tier=${tier}`,
         cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/payment/cancelled`,
-        customer_email: userEmail,
+        customer: { email: userEmail },
         metadata: {
           email: userEmail,
           tier,
@@ -69,7 +70,12 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Creem API error:", response.status, errorText);
-      return NextResponse.json({ error: "Payment service error" }, { status: 502 });
+      let message = "Payment service error";
+      try {
+        const err = JSON.parse(errorText);
+        if (err.message) message = err.message;
+      } catch { /* ignore parse errors */ }
+      return NextResponse.json({ error: message }, { status: 502 });
     }
 
     const data = await response.json();

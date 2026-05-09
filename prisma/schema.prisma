@@ -14,15 +14,56 @@ datasource db {
 
 /// 用户表：存储用户信息及剩余生成次数
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  name      String?
-  image     String?
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  emailVerified DateTime?
   freeCount Int       @default(2)    // 免费生成次数（默认 2 次）
   paidCount Int       @default(0)    // 已购买的付费生成次数
   articles  Article[]
+  accounts  Account[]
+  sessions  Session[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+/// NextAuth OAuth 账号关联（GitHub / Auth0 / Google 登录必需）
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+/// NextAuth 会话（JWT 策略下不使用，但 PrismaAdapter 需要此模型）
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// NextAuth 邮箱验证令牌（OAuth 登录无需此表，但 PrismaAdapter 需要定义）
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 /// 文章表：存储每次 AI 生成的结果

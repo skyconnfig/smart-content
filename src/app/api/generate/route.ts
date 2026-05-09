@@ -5,14 +5,14 @@
 // ============================================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth0 } from "@/lib/auth0";
-import { prisma } from "@/lib/db";
+import { auth } from "@/lib/auth";
+import { prisma, ensureUser } from "@/lib/db";
 import { generateText } from "@/lib/ai";
 
 export async function POST(request: NextRequest) {
   try {
     // 1. 验证用户身份
-    const session = await auth0.getSession();
+    const session = await auth();
     const userEmail = session?.user?.email;
 
     if (!userEmail) {
@@ -34,14 +34,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Please select a template style" }, { status: 400 });
     }
 
-    // 3. 查询用户及剩余次数
-    const user = await prisma.user.findUnique({
-      where: { email: userEmail },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    // 3. 查询用户（首次登录自动创建）
+    const user = await ensureUser(userEmail);
 
     const totalRemaining = user.freeCount + user.paidCount;
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Serif_Display, DM_Sans } from "next/font/google";
-import AuthProvider from "@/components/AuthProvider";
+import SessionProvider from "@/components/SessionProvider";
 import ThemeProvider from "@/components/ThemeProvider";
 import Navbar from "@/components/Navbar";
 import "./globals.css";
@@ -55,7 +55,7 @@ export default function RootLayout({
       </head>
       {/* Grain overlay is applied via CSS class "grain" — we add it here once */}
       <body className="flex min-h-full flex-col bg-bg-base text-text-body grain">
-        <AuthProvider>
+        <SessionProvider>
           <ThemeProvider>
             <Navbar />
             <main className="flex-1">{children}</main>
@@ -63,7 +63,7 @@ export default function RootLayout({
               <p>&copy; {new Date().getFullYear()} CopyForge. All rights reserved.</p>
             </footer>
           </ThemeProvider>
-        </AuthProvider>
+        </SessionProvider>
       </body>
     </html>
   );

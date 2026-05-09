@@ -1,13 +1,14 @@
 "use client";
 
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
-  const { user, isLoading } = useUser();
+  const { data: session, status } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const loading = status === "loading";
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border-light bg-bg-base/80 backdrop-blur-lg">
@@ -30,9 +31,9 @@ export default function Navbar() {
 
           <ThemeToggle />
 
-          {isLoading ? (
+          {loading ? (
             <div className="ml-3 h-8 w-20 animate-pulse rounded-md bg-bg-elevated" />
-          ) : user ? (
+          ) : session?.user ? (
             <div className="ml-3 flex items-center gap-2">
               <Link
                 href="/dashboard"
@@ -41,20 +42,20 @@ export default function Navbar() {
                 Dashboard
               </Link>
               <div className="group relative">
-                {user.picture ? (
+                {session.user.image ? (
                   <img
-                    src={user.picture}
+                    src={session.user.image}
                     alt=""
                     className="h-8 w-8 rounded-full border border-border-light object-cover"
                   />
                 ) : (
                   <div className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gradient-to-br from-accent-teal to-accent-copper text-xs font-bold text-white">
-                    {user.email?.[0]?.toUpperCase() || "U"}
+                    {session.user.email?.[0]?.toUpperCase() || "U"}
                   </div>
                 )}
                 <div className="invisible absolute right-0 top-full z-10 mt-2 w-48 rounded-xl border border-border-light bg-bg-surface p-1.5 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100">
                   <div className="border-b border-border-light px-3 py-2 text-xs text-text-muted">
-                    {user.email}
+                    {session.user.email}
                   </div>
                   <Link
                     href="/dashboard"
@@ -62,23 +63,23 @@ export default function Navbar() {
                   >
                     Dashboard
                   </Link>
-                  <a
-                    href="/auth/logout"
+                  <button
+                    onClick={() => signOut()}
                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-accent-copper hover:bg-accent-copper-bg"
                   >
                     Sign Out
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
           ) : (
             <div className="ml-3 flex items-center gap-2">
-              <a
-                href="/auth/login"
+              <button
+                onClick={() => signIn()}
                 className="rounded-md px-4 py-2 text-sm font-medium text-text-muted transition-colors hover:text-text-heading"
               >
                 Log in
-              </a>
+              </button>
               <Link
                 href="/signup"
                 className="rounded-md bg-gradient-to-r from-accent-teal to-accent-copper px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:shadow-md"
@@ -116,20 +117,20 @@ export default function Navbar() {
               <span className="text-sm text-text-body">Theme</span>
               <ThemeToggle />
             </div>
-            {user ? (
+            {session?.user ? (
               <>
                 <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-2.5 text-sm text-text-body hover:bg-bg-elevated">
                   Dashboard
                 </Link>
-                <a href="/auth/logout" className="rounded-md px-3 py-2.5 text-left text-sm text-accent-copper hover:bg-accent-copper-bg">
+                <button onClick={() => signOut()} className="rounded-md px-3 py-2.5 text-left text-sm text-accent-copper hover:bg-accent-copper-bg">
                   Sign Out
-                </a>
+                </button>
               </>
             ) : (
               <>
-                <a href="/auth/login" className="rounded-md px-3 py-2.5 text-left text-sm text-text-body hover:bg-bg-elevated">
+                <button onClick={() => signIn()} className="rounded-md px-3 py-2.5 text-left text-sm text-text-body hover:bg-bg-elevated">
                   Log in
-                </a>
+                </button>
                 <Link href="/signup" onClick={() => setMobileOpen(false)} className="rounded-md bg-gradient-to-r from-accent-teal to-accent-copper px-3 py-2.5 text-center text-sm font-medium text-white">
                   Get Started
                 </Link>

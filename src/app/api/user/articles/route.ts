@@ -3,25 +3,19 @@
 // ============================================================
 
 import { NextResponse } from "next/server";
-import { auth0 } from "@/lib/auth0";
-import { prisma } from "@/lib/db";
+import { auth } from "@/lib/auth";
+import { prisma, ensureUser } from "@/lib/db";
 
 export async function GET() {
   try {
-    const session = await auth0.getSession();
+    const session = await auth();
     const userEmail = session?.user?.email;
 
     if (!userEmail) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: userEmail },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    const user = await ensureUser(userEmail);
 
     const articles = await prisma.article.findMany({
       where: { userId: user.id },

@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  serverExternalPackages: ["undici"],
 };
 
 export default nextConfig;

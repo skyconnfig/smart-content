@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -12,7 +12,7 @@ const TIER_CREDITS: Record<string, number> = {
 };
 
 function SuccessContent() {
-  const { user, isLoading } = useUser();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [countdown, setCountdown] = useState(5);
@@ -21,10 +21,11 @@ function SuccessContent() {
   const credits = TIER_CREDITS[tier] || 30;
 
   useEffect(() => {
-    if (!user) {
+    if (status === "unauthenticated") {
       router.push("/login");
       return;
     }
+    if (status !== "authenticated") return;
     const timer = setInterval(() => {
       setCountdown((n) => {
         if (n <= 1) {
@@ -36,9 +37,9 @@ function SuccessContent() {
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [user, router]);
+  }, [status, router]);
 
-  if (isLoading) {
+  if (status === "loading") {
     return (
       <div className="flex min-h-[80vh] items-center justify-center px-4">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-teal border-t-transparent" />

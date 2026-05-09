@@ -1,19 +1,19 @@
 "use client";
 
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
 
 export default function PaymentCancelledPage() {
-  const { user, isLoading } = useUser();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (!user) router.push("/login");
-  }, [user, router]);
+    if (status === "unauthenticated") router.push("/login");
+  }, [status, router]);
 
-  if (isLoading) {
+  if (status === "loading") {
     return (
       <div className="flex min-h-[80vh] items-center justify-center px-4">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent-teal border-t-transparent" />

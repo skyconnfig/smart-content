@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { useSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import KeywordInput from "@/components/KeywordInput";
 import TemplateSelect from "@/components/TemplateSelect";
@@ -10,7 +10,7 @@ import PurchaseButton from "@/components/PurchaseButton";
 import type { TemplateStyle } from "@/types";
 
 export default function Home() {
-  const { user } = useUser();
+  const { data: session } = useSession();
   const [keyword, setKeyword] = useState("");
   const [template, setTemplate] = useState<TemplateStyle>("blog");
   const [result, setResult] = useState<string | null>(null);
@@ -20,7 +20,7 @@ export default function Home() {
   const [remainingFree, setRemainingFree] = useState<number | null>(null);
 
   const handleGenerate = useCallback(async () => {
-    if (!user?.email) { window.location.href = "/auth/login"; return; }
+    if (!session?.user?.email) { signIn(); return; }
     if (!keyword.trim()) { setError("Enter a topic to get started."); return; }
 
     setIsLoading(true);
@@ -46,7 +46,7 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  }, [keyword, template, user]);
+  }, [keyword, template, session]);
 
   return (
     <div className="mx-auto max-w-6xl px-5 sm:px-8">
@@ -118,17 +118,7 @@ export default function Home() {
                 <span className="flex h-2 w-2 rounded-full bg-accent-teal" />
                 Ready to generate
               </div>
-              <div className="space-y-3">
-                <div className="h-2.5 w-3/4 rounded bg-bg-elevated" />
-                <div className="h-2.5 w-1/2 rounded bg-bg-elevated" />
-                <div className="mt-5 h-20 rounded-lg border border-border-light bg-bg-base p-3">
-                  <div className="space-y-2">
-                    <div className="h-2 w-full rounded bg-bg-elevated" />
-                    <div className="h-2 w-5/6 rounded bg-bg-elevated" />
-                    <div className="h-2 w-2/3 rounded bg-bg-elevated" />
-                  </div>
-                </div>
-              </div>
+              <TypewriterPromo />
               <div className="flex items-center justify-end gap-1.5 text-xs text-text-dim">
                 <span className="flex h-1 w-1 rounded-full bg-accent-copper" />
                 AI-generated
@@ -158,7 +148,7 @@ export default function Home() {
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
               </svg>
-              {user ? (
+              {session?.user ? (
                 <span>Credits: <span className="font-medium text-text-body">{remainingFree ?? "—"} remaining</span></span>
               ) : (
                 <span>Sign in to get started</span>
@@ -277,10 +267,10 @@ export default function Home() {
             </div>
             <div className="mt-auto pt-8">
               <Link
-                href={user ? "#generator" : "/signup"}
+                href={session?.user ? "#generator" : "/signup"}
                 className="flex w-full items-center justify-center rounded-md border border-border-light px-4 py-2.5 text-sm font-medium text-text-body transition-colors hover:bg-bg-elevated"
               >
-                {user ? "Start Writing" : "Create Free Account"}
+                {session?.user ? "Start Writing" : "Create Free Account"}
               </Link>
             </div>
           </div>
@@ -319,8 +309,8 @@ export default function Home() {
               </ul>
             </div>
             <div className="relative mt-auto pt-8">
-              {user ? (
-                <PurchaseButton email={user.email!} tier="creator" credits={30} price="4.99" label="Get 30 Credits — $4.99" />
+              {session?.user ? (
+                <PurchaseButton email={session?.user.email!} tier="creator" credits={30} price="4.99" label="Get 30 Credits — $4.99" />
               ) : (
                 <Link
                   href="/signup"
@@ -362,8 +352,8 @@ export default function Home() {
               </ul>
             </div>
             <div className="mt-auto pt-8">
-              {user ? (
-                <PurchaseButton email={user.email!} tier="pro" credits={200} price="12.99" label="Get 200 Credits — $12.99" />
+              {session?.user ? (
+                <PurchaseButton email={session?.user.email!} tier="pro" credits={200} price="12.99" label="Get 200 Credits — $12.99" />
               ) : (
                 <Link
                   href="/signup"
@@ -390,7 +380,7 @@ export default function Home() {
               Join thousands of writers, marketers, and entrepreneurs using CopyForge to produce content at the speed of AI.
             </p>
             <div className="mt-8 flex items-center justify-center gap-4">
-              {user ? (
+              {session?.user ? (
                 <a href="#generator" className="rounded-md bg-white px-5 py-2.5 text-sm font-medium text-accent-teal shadow-sm transition-all hover:bg-white/90">
                   Generate Content Now
                 </a>
@@ -399,15 +389,90 @@ export default function Home() {
                   <Link href="/signup" className="rounded-md bg-white px-5 py-2.5 text-sm font-medium text-accent-teal shadow-sm transition-all hover:bg-white/90">
                     Get Started Free
                   </Link>
-                  <a href="/auth/login" className="rounded-md border border-white/30 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10">
+                  <button onClick={() => signIn()} className="rounded-md border border-white/30 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10">
                     Sign In
-                  </a>
+                  </button>
                 </>
               )}
             </div>
           </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+/**
+ * 右侧装饰卡片 — 打字机宣传文案
+ * 循环展示 AI 生成的示例文本，吸引用户
+ */
+const PHRASES = [
+  "Turn keywords into compelling blog posts in seconds.",
+  "SEO-optimized content that ranks. Written by AI, refined by you.",
+  "From idea to article — one click, four styles, zero effort.",
+  "E-commerce copy that sells. Academic writing that impresses.",
+  "Stop staring at a blank page. Let AI write your first draft.",
+];
+
+function TypewriterPromo() {
+  const [displayed, setDisplayed] = useState("");
+  const [phraseIdx, setPhraseIdx] = useState(0);
+  const [phase, setPhase] = useState<"typing" | "pause" | "deleting">("typing");
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const current = PHRASES[phraseIdx];
+
+    if (phase === "typing") {
+      let i = 0;
+      timerRef.current = setInterval(() => {
+        i++;
+        setDisplayed(current.slice(0, i));
+        if (i >= current.length) {
+          clearInterval(timerRef.current ?? undefined);
+          setPhase("pause");
+        }
+      }, 35);
+    } else if (phase === "pause") {
+      timerRef.current = setTimeout(() => setPhase("deleting"), 2000);
+    } else if (phase === "deleting") {
+      let i = current.length;
+      timerRef.current = setInterval(() => {
+        i--;
+        setDisplayed(current.slice(0, i));
+        if (i <= 0) {
+          clearInterval(timerRef.current ?? undefined);
+          setPhraseIdx((p) => (p + 1) % PHRASES.length);
+          setPhase("typing");
+        }
+      }, 15);
+    }
+
+    return () => {
+      clearInterval(timerRef.current ?? undefined);
+      clearTimeout(timerRef.current ?? undefined);
+    };
+  }, [phase, phraseIdx]);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-1.5 text-xs text-accent-teal font-medium">
+        <span className="flex h-1.5 w-1.5 rounded-full bg-accent-teal animate-pulse" />
+        Generating sample
+      </div>
+      <div className="rounded-lg border border-border-light bg-bg-base p-4 min-h-[5rem] flex items-start">
+        <p className="text-sm leading-relaxed text-text-body">
+          {displayed}
+          <span className="inline-flex w-[2px] h-[1.1em] ml-0.5 bg-accent-teal animate-pulse" />
+        </p>
+      </div>
+      <div className="flex items-center gap-3 text-[11px] text-text-dim">
+        <span className="flex items-center gap-1">
+          <span className="flex h-1 w-1 rounded-full bg-accent-copper" />
+          AI-generated
+        </span>
+        <span>{phraseIdx + 1}/{PHRASES.length}</span>
+      </div>
     </div>
   );
 }
