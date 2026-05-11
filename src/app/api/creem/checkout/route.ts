@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         product_id: config.productId,
-        success_url: `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/payment/success?tier=${tier}`,
+        success_url: `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/thank-you?tier=${tier}`,
         customer: { email: userEmail },
         metadata: {
           email: userEmail,
