@@ -24,20 +24,20 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "CopyForge — AI-Powered Content Studio",
+    default: "CopyForge — AI-Powered AI Writing & Blog Content Studio",
     template: "%s — CopyForge",
   },
   description:
-    "Turn any idea into a polished blog post, news article, e-commerce copy, or academic piece in seconds. No learning curve—just type and generate.",
-  keywords: ["AI writing", "content generator", "blog writer", "copywriting"],
+    "Generate blog posts, news articles, e-commerce copy, or academic content in seconds with CopyForge AI. No learning curve—start creating high-quality content instantly.",
+  keywords: ["AI writing", "content generator", "blog writer", "copywriting", "AI content studio", "automated blog posts", "SEO content generator", "article creator"],
   metadataBase: new URL(baseUrl),
   alternates: {
     canonical: baseUrl,
   },
   openGraph: {
-    title: "CopyForge — AI-Powered Content Studio",
+    title: "CopyForge — AI-Powered AI Writing & Blog Content Studio",
     description:
-      "Turn any idea into a polished blog post, news article, e-commerce copy, or academic piece in seconds.",
+      "Generate blog posts, news articles, e-commerce copy, or academic content in seconds with CopyForge AI. No learning curve—start creating high-quality content instantly.",
     url: baseUrl,
     siteName: "CopyForge",
     locale: "en_US",
@@ -53,9 +53,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "CopyForge — AI-Powered Content Studio",
+    title: "CopyForge — AI-Powered AI Writing & Blog Content Studio",
     description:
-      "Turn any idea into a polished blog post, news article, e-commerce copy, or academic piece in seconds.",
+      "Generate blog posts, news articles, e-commerce copy, or academic content in seconds with CopyForge AI. No learning curve—start creating high-quality content instantly.",
     images: ["/og-image.png"],
   },
   robots: {
