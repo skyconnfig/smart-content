@@ -377,7 +377,7 @@ export default function Home() {
           <div className="relative">
             <h2 className="font-serif text-3xl text-white sm:text-4xl">Ready to create something great?</h2>
             <p className="mx-auto mt-4 max-w-lg text-sm text-white/80">
-              Join thousands of writers, marketers, and entrepreneurs using CopyForge to produce content at the speed of AI.
+              Join writers, marketers, and entrepreneurs using CopyForge to produce content at the speed of AI.
             </p>
             <div className="mt-8 flex items-center justify-center gap-4">
               {session?.user ? (
