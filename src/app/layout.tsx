@@ -141,6 +141,7 @@ export default function RootLayout({
             <footer className="border-t border-border-light py-10 text-center text-xs text-text-dim">
               <div className="mx-auto max-w-6xl px-5 sm:px-8">
                 <nav className="mb-3 flex items-center justify-center gap-6">
+                  <a href="/about" className="transition-colors hover:text-text-body">About</a>
                   <a href="/privacy" className="transition-colors hover:text-text-body">Privacy Policy</a>
                   <a href="/terms" className="transition-colors hover:text-text-body">Terms of Service</a>
                   <a href="mailto:support@lxs.best" className="transition-colors hover:text-text-body">support@lxs.best</a>

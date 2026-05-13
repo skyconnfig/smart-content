@@ -26,6 +26,7 @@ export default function Navbar() {
         {/* Desktop */}
         <div className="hidden items-center gap-1 sm:flex">
           <NavLink href="/#pricing">Pricing</NavLink>
+          <NavLink href="/about">About</NavLink>
 
           <div className="mx-3 h-4 w-px bg-border-light" />
 
@@ -112,6 +113,9 @@ export default function Navbar() {
           <div className="flex flex-col gap-1">
             <Link href="/#pricing" onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-2.5 text-sm text-text-body hover:bg-bg-elevated">
               Pricing
+            </Link>
+            <Link href="/about" onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-2.5 text-sm text-text-body hover:bg-bg-elevated">
+              About
             </Link>
             <div className="flex items-center justify-between rounded-md px-3 py-2.5">
               <span className="text-sm text-text-body">Theme</span>
