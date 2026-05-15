@@ -12,7 +12,7 @@ const CREEM_API_KEY = process.env.CREEM_API_KEY || "";
 /// 套餐配置映射
 const TIER_CONFIG: Record<string, { productId: string; credits: number }> = {
   creator: {
-    productId: process.env.CREEM_PRODUCT_ID_CREATOR || "",
+    productId: process.env.CREEM_PRODUCT_ID_BASIC || "",
     credits: 30,
   },
   pro: {
